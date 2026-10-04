@@ -1,0 +1,23 @@
+# Large/raw data - do not commit
+data/raw/*.csv
+data/processed/*.csv
+data/processed/*.joblib
+outputs/figures/*.png
+outputs/figures/*.html
+outputs/tables/*.txt
+outputs/tables/*.csv
+
+# Exceptions
+!outputs/tables/cluster_validation.csv
+!outputs/tables/stability_report.md
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
