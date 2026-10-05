@@ -32,6 +32,12 @@ else:
     
 selected_district = st.sidebar.selectbox("District", ["All"] + list(districts))
 
+if selected_district != "All":
+    villages = sorted(df[(df['state_name'] == selected_state) & (df['district_name'] == selected_district)]['village_name'].dropna().unique())
+    selected_village = st.sidebar.selectbox("Village", ["All"] + list(villages))
+else:
+    selected_village = "All"
+
 soil_zones = sorted(df['soil_zone_name'].dropna().unique())
 selected_zones = st.sidebar.multiselect("Soil Zone", soil_zones, default=soil_zones)
 
@@ -44,6 +50,8 @@ if selected_state != "All":
     filtered_df = filtered_df[filtered_df['state_name'] == selected_state]
 if selected_district != "All":
     filtered_df = filtered_df[filtered_df['district_name'] == selected_district]
+if selected_village != "All":
+    filtered_df = filtered_df[filtered_df['village_name'] == selected_village]
 filtered_df = filtered_df[filtered_df['soil_zone_name'].isin(selected_zones)]
 
 if anomaly_status == "Global anomaly only":
@@ -106,17 +114,18 @@ with tab1:
 with tab2:
     st.header("Village Lookup")
     
-    search_query = st.text_input("Search for a village by name...")
+    search_query = st.text_input("Search for a village by name (optional)...")
     
+    search_results = filtered_df.copy()
     if search_query:
-        search_results = filtered_df[filtered_df['village_name'].str.contains(search_query, case=False, na=False)]
+        search_results = search_results[search_results['village_name'].str.contains(search_query, case=False, na=False)]
         
-        if len(search_results) == 0:
-            st.info("No villages found matching your search in the current filtered set.")
-        else:
-            if len(search_results) > 50:
-                st.warning(f"Found {len(search_results)} matches. Showing first 50.")
-                search_results = search_results.head(50)
+    if len(search_results) == 0:
+        st.info("No villages found matching the current filters.")
+    else:
+        if len(search_results) > 50:
+            st.warning(f"Found {len(search_results):,} villages matching filters. Showing the first 50. Use the search bar or sidebar to narrow down.")
+            search_results = search_results.head(50)
                 
             for _, r in search_results.iterrows():
                 n_val = int(r['n_samples']) if pd.notna(r['n_samples']) else "Unknown"
