@@ -44,8 +44,7 @@ if selected_state != "All":
     filtered_df = filtered_df[filtered_df['state_name'] == selected_state]
 if selected_district != "All":
     filtered_df = filtered_df[filtered_df['district_name'] == selected_district]
-if selected_zones:
-    filtered_df = filtered_df[filtered_df['soil_zone_name'].isin(selected_zones)]
+filtered_df = filtered_df[filtered_df['soil_zone_name'].isin(selected_zones)]
 
 if anomaly_status == "Global anomaly only":
     filtered_df = filtered_df[(filtered_df['dbscan_label'] == -1) & (~filtered_df['is_local_anomaly'])]
@@ -90,7 +89,7 @@ with tab1:
     with colB:
         st.subheader("Top 10 Anomaly-Hotspot Districts (n >= 30)")
         # Calculate anomaly percentage per district
-        dist_stats = df.groupby(['state_name', 'district_name']).agg(
+        dist_stats = filtered_df.groupby(['state_name', 'district_name']).agg(
             total_villages=('village_name', 'count'),
             global_anomalies=('dbscan_label', lambda x: (x == -1).sum())
         ).reset_index()
